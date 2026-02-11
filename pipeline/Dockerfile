@@ -9,15 +9,11 @@ ENV PATH="/code/.venv/bin:$PATH"
  
 COPY pyproject.toml .python-version uv.lock ./
 
-
-
-
-
 #Ensure that the same dependecies are installed from uv.lock and virtual environment
 RUN uv sync --locked 
 
-COPY pipeline.py .
+COPY ingest_data.py .
 
 # ENTRYPOINT ["uv", "run", "python", "pipeline.py" ]
 # When using ENV PATH above, you dont need "uv". See below
-ENTRYPOINT ["python", "pipeline.py" ]
+ENTRYPOINT ["uv", "run", "python", "ingest_data.py"]

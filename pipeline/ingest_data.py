@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import pandas as pd
+import click
 from sqlalchemy import create_engine
 from tqdm.auto import tqdm
 
@@ -29,17 +30,17 @@ parse_dates = [
     "tpep_dropoff_datetime"
 ]
 
-def run():
-    year = 2021
-    month = 1
-    pg_user = 'root'
-    pg_pass = 'root'
-    pg_host = 'localhost'
-    pg_port = 5432
-    pg_db = 'ny_taxi'
-    chunksize = 100000
-    target_table = 'yellow_taxi_data'
-
+def run(
+    year: int,
+    month: int,
+    pg_user: str,
+    pg_pass: str,
+    pg_host: str,
+    pg_port: int,
+    pg_db: str,
+    chunksize: int,
+    target_table: str,
+):
     engine = create_engine(f'postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}')
     prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/'
     url = f'{prefix}/yellow_tripdata_{year}-{month:02d}.csv.gz'
@@ -69,8 +70,41 @@ def run():
         )
 
 
+@click.command()
+@click.option('--year', default=2021, show_default=True, type=int, help='Year of dataset')
+@click.option('--month', default=1, show_default=True, type=int, help='Month of dataset (1-12)')
+@click.option('--pg-user', default='root', show_default=True, help='Postgres user')
+@click.option('--pg-pass', default='root', show_default=True, help='Postgres password')
+@click.option('--pg-host', default='localhost', show_default=True, help='Postgres host')
+@click.option('--pg-port', default=5432, show_default=True, type=int, help='Postgres port')
+@click.option('--pg-db', default='ny_taxi', show_default=True, help='Postgres database')
+@click.option('--chunksize', default=100000, show_default=True, type=int, help='CSV read chunksize')
+@click.option('--target-table', default='yellow_taxi_data', show_default=True, help='Target table name')
+def main(
+    year,
+    month,
+    pg_user,
+    pg_pass,
+    pg_host,
+    pg_port,
+    pg_db,
+    chunksize,
+    target_table,
+):
+    run(
+        year=year,
+        month=month,
+        pg_user=pg_user,
+        pg_pass=pg_pass,
+        pg_host=pg_host,
+        pg_port=pg_port,
+        pg_db=pg_db,
+        chunksize=chunksize,
+        target_table=target_table,
+    )
+
 if __name__ == "__main__":
-    run()
+    main()
 
 
 
